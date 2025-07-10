@@ -203,6 +203,8 @@ def main():
                        help='Disable visualization during training')
     parser.add_argument('--load', type=str, default=None,
                        help='Load pre-trained model from file')
+    parser.add_argument('--fast', action='store_true',
+                       help='Fast training mode (no frame rate limit)')
     
     args = parser.parse_args()
     
@@ -219,6 +221,9 @@ def main():
     visualizer = None
     if not args.no_vis or args.mode in ['demo', 'both']:
         visualizer = Visualizer(env, agent)
+        # 设置快速训练模式
+        if args.fast and args.mode in ['train', 'both']:
+            visualizer.set_fps(visualizer.config['fast_fps'])
     
     try:
         if args.mode == 'train':

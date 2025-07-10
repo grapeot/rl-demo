@@ -63,8 +63,9 @@ class Visualizer:
         # 绘制
         self.draw()
         
-        # 控制帧率
-        self.clock.tick(self.fps)
+        # 控制帧率（0表示无延时）
+        if self.fps > 0:
+            self.clock.tick(self.fps)
     
     def draw(self):
         """绘制整个界面"""

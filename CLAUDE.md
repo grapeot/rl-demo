@@ -30,11 +30,14 @@ python main.py --mode demo
 # 训练并演示
 python main.py --mode both
 
-# 无可视化训练（更快）
+# 无可视化训练（最快）
 python main.py --mode train --no-vis
 
+# 快速训练（有可视化但无延时）
+python main.py --mode train --fast
+
 # 指定训练回合数
-python main.py --mode train --episodes 500
+python main.py --mode train --episodes 500 --fast
 ```
 
 ## 项目结构
