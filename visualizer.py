@@ -65,6 +65,11 @@ class Visualizer:
                 is_death = reward == -100
                 self.death_history.append(is_death)
                 self._update_death_rate()
+                
+                # 调试信息
+                if is_death:
+                    print(f"DEBUG: Death detected! Final reward: {reward}, Total reward: {self.current_episode_reward}")
+                
                 self.current_episode_reward = 0
         
         # 添加日志
@@ -231,8 +236,10 @@ class Visualizer:
         
         # 绘制Q值
         y_offset = header_y + 35
-        max_rows = 15  # 最多显示15行
-        row_height = 25
+        # 根据区域高度动态计算最大行数
+        available_height = self.qtable_area.height - 70  # 减去标题和表头的高度
+        row_height = 20  # 减小行高
+        max_rows = min(12, available_height // row_height)  # 最多显示12行
         
         # 对Q-Table按状态排序
         sorted_states = sorted(self.agent.q_table.keys(), 
