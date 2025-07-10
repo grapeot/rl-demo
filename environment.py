@@ -101,6 +101,11 @@ class RoadEnvironment:
         self.time_step += 1
         self._spawn_cars()
         
+        # 在车辆生成后再次检查碰撞（如果还没有碰撞的话）
+        if not self.done and 0 <= self.robot_position < self.num_lanes and self.cars_in_lanes[self.robot_position]:
+            reward = self.reward_config['collision_penalty']
+            self.done = True
+        
         # 获取新状态
         new_state = self._get_state()
         
