@@ -1,0 +1,54 @@
+"""
+配置文件 - 包含所有可调整的参数
+"""
+
+# 环境参数
+ENV_CONFIG = {
+    'num_lanes': 5,                    # 车道数量
+    'start_position': -1,              # 起点位置
+    'end_position': 5,                 # 终点位置
+    'traffic_light_cycle': 10,         # 红绿灯周期（步数）
+    'car_spawn_probability': 0.3,      # 车辆生成概率
+}
+
+# Q-Learning参数
+QL_CONFIG = {
+    'alpha': 0.1,                      # 学习率
+    'gamma': 0.9,                      # 折扣因子
+    'epsilon': 1.0,                    # 探索率初始值
+    'epsilon_decay': 0.995,            # 探索率衰减
+    'epsilon_min': 0.01,               # 最小探索率
+}
+
+# 奖励设置
+REWARD_CONFIG = {
+    'goal_reward': 50,                 # 到达终点奖励
+    'collision_penalty': -100,         # 碰撞惩罚
+    'step_penalty': -1,                # 每步惩罚
+}
+
+# 训练参数
+TRAIN_CONFIG = {
+    'num_episodes': 1000,              # 训练回合数
+    'max_steps_per_episode': 100,      # 每回合最大步数
+    'save_interval': 100,              # 保存模型间隔
+}
+
+# 可视化参数
+VIS_CONFIG = {
+    'window_width': 1200,              # 窗口宽度
+    'window_height': 800,              # 窗口高度
+    'fps': 10,                         # 帧率（训练时）
+    'demo_fps': 2,                     # 帧率（演示时）
+    'colors': {
+        'background': (240, 240, 240),
+        'road': (100, 100, 100),
+        'lane_divider': (255, 255, 255),
+        'car': (255, 0, 0),
+        'robot': (0, 0, 255),
+        'goal': (0, 255, 0),
+        'text': (0, 0, 0),
+        'red_light': (255, 0, 0),
+        'green_light': (0, 255, 0),
+    }
+}
