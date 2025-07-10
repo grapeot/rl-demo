@@ -33,9 +33,10 @@ class Visualizer:
         width = self.config['window_width']
         height = self.config['window_height']
         
-        self.env_area = pygame.Rect(10, 50, int(width * 0.55), int(height * 0.65))
-        self.qtable_area = pygame.Rect(int(width * 0.58), 50, int(width * 0.4), int(height * 0.65))
-        self.log_area = pygame.Rect(10, int(height * 0.75), width - 20, int(height * 0.22))
+        self.env_area = pygame.Rect(10, 50, int(width * 0.4), int(height * 0.45))
+        self.qtable_area = pygame.Rect(int(width * 0.42), 50, int(width * 0.25), int(height * 0.45))
+        self.chart_area = pygame.Rect(int(width * 0.69), 50, int(width * 0.29), int(height * 0.45))
+        self.log_area = pygame.Rect(10, int(height * 0.52), width - 20, int(height * 0.45))
         
         # 日志系统
         self.log_messages = deque(maxlen=10)
@@ -44,21 +45,34 @@ class Visualizer:
         self.episode_rewards = []
         self.current_episode_reward = 0
         
+        # 死亡率统计
+        self.death_history = []  # 记录每个episode是否死亡 (True/False)
+        self.death_rate_smoothed = []  # 平滑的死亡率
+        self.smoothing_window = 50  # 平滑窗口大小
+        
         # 时钟控制
         self.clock = pygame.time.Clock()
         self.fps = self.config['fps']
         
-    def update(self, state, action, reward, done=False):
+    def update(self, state, action, reward, done=False, show_initial=False):
         """更新可视化"""
         # 更新统计
-        self.current_episode_reward += reward
-        if done:
-            self.episode_rewards.append(self.current_episode_reward)
-            self.current_episode_reward = 0
+        if not show_initial:  # 初始状态不计入统计
+            self.current_episode_reward += reward
+            if done:
+                self.episode_rewards.append(self.current_episode_reward)
+                # 记录是否死亡（奖励-100表示碰撞死亡）
+                is_death = reward == -100
+                self.death_history.append(is_death)
+                self._update_death_rate()
+                self.current_episode_reward = 0
         
         # 添加日志
-        action_name = self.env.actions[action] if isinstance(action, int) else action
-        self._add_log(f"State: {state}, Action: {action_name}, Reward: {reward}")
+        if show_initial:
+            self._add_log(f"Initial State: {state}")
+        else:
+            action_name = self.env.actions[action] if isinstance(action, int) else action
+            self._add_log(f"State: {state}, Action: {action_name}, Reward: {reward}")
         
         # 绘制
         self.draw()
@@ -75,9 +89,10 @@ class Visualizer:
         # 绘制标题
         self._draw_title()
         
-        # 绘制三个主要区域
+        # 绘制四个主要区域
         self._draw_environment()
         self._draw_qtable()
+        self._draw_death_rate_chart()
         self._draw_logs()
         
         # 更新显示
@@ -89,6 +104,9 @@ class Visualizer:
         if self.episode_rewards:
             avg_reward = sum(self.episode_rewards[-10:]) / min(10, len(self.episode_rewards))
             title_text += f" | Avg Reward (last 10): {avg_reward:.1f}"
+        if self.death_rate_smoothed:
+            current_death_rate = self.death_rate_smoothed[-1]
+            title_text += f" | Death Rate: {current_death_rate:.1%}"
         
         title_surface = self.font.render(title_text, True, self.colors['text'])
         self.screen.blit(title_surface, (10, 10))
@@ -254,6 +272,78 @@ class Visualizer:
             self.screen.blit(text_surface, 
                            (self.qtable_area.x + 10, y_offset + max_rows * row_height))
     
+    def _draw_death_rate_chart(self):
+        """绘制死亡率图表"""
+        # 绘制边框
+        pygame.draw.rect(self.screen, self.colors['text'], self.chart_area, 2)
+        
+        # 标题
+        title_surface = self.font.render("Death Rate", True, self.colors['text'])
+        self.screen.blit(title_surface, (self.chart_area.x + 10, self.chart_area.y + 5))
+        
+        # 统计信息
+        stats_y = self.chart_area.y + 35
+        if self.death_history:
+            total_episodes = len(self.death_history)
+            total_deaths = sum(self.death_history)
+            current_rate = self.death_rate_smoothed[-1] if self.death_rate_smoothed else 0
+            
+            stats_text = [
+                f"Episodes: {total_episodes}",
+                f"Deaths: {total_deaths}",
+                f"Rate: {current_rate:.2%}"
+            ]
+            
+            for i, text in enumerate(stats_text):
+                text_surface = self.small_font.render(text, True, self.colors['text'])
+                self.screen.blit(text_surface, (self.chart_area.x + 10, stats_y + i * 20))
+        
+        # 绘制图表
+        if len(self.death_rate_smoothed) > 1:
+            chart_start_y = stats_y + 80
+            chart_height = self.chart_area.height - 120
+            chart_width = self.chart_area.width - 20
+            
+            # 图表背景
+            chart_rect = pygame.Rect(self.chart_area.x + 10, chart_start_y, 
+                                   chart_width, chart_height)
+            pygame.draw.rect(self.screen, (250, 250, 250), chart_rect)
+            pygame.draw.rect(self.screen, self.colors['text'], chart_rect, 1)
+            
+            # 绘制数据点
+            max_points = min(100, len(self.death_rate_smoothed))  # 最多显示100个点
+            if max_points > 1:
+                step = len(self.death_rate_smoothed) // max_points if len(self.death_rate_smoothed) > max_points else 1
+                data_points = self.death_rate_smoothed[::step][-max_points:]
+                
+                # 计算坐标
+                x_step = chart_width / (len(data_points) - 1) if len(data_points) > 1 else 0
+                
+                for i in range(len(data_points) - 1):
+                    x1 = self.chart_area.x + 10 + i * x_step
+                    y1 = chart_start_y + chart_height - (data_points[i] * chart_height)
+                    x2 = self.chart_area.x + 10 + (i + 1) * x_step
+                    y2 = chart_start_y + chart_height - (data_points[i + 1] * chart_height)
+                    
+                    # 绘制线段
+                    pygame.draw.line(self.screen, (255, 0, 0), (x1, y1), (x2, y2), 2)
+                    
+                    # 绘制数据点
+                    pygame.draw.circle(self.screen, (200, 0, 0), (int(x1), int(y1)), 2)
+                
+                # 绘制最后一个点
+                if data_points:
+                    last_x = self.chart_area.x + 10 + (len(data_points) - 1) * x_step
+                    last_y = chart_start_y + chart_height - (data_points[-1] * chart_height)
+                    pygame.draw.circle(self.screen, (200, 0, 0), (int(last_x), int(last_y)), 2)
+            
+            # Y轴标签
+            y_labels = ["0%", "50%", "100%"]
+            for i, label in enumerate(y_labels):
+                y_pos = chart_start_y + chart_height - (i * chart_height / 2)
+                text_surface = self.small_font.render(label, True, self.colors['text'])
+                self.screen.blit(text_surface, (self.chart_area.x - 25, y_pos - 10))
+    
     def _get_q_value_color(self, q_value):
         """根据Q值返回颜色"""
         if q_value > 10:
@@ -281,6 +371,19 @@ class Visualizer:
         for i, message in enumerate(self.log_messages):
             text_surface = self.small_font.render(message, True, self.colors['text'])
             self.screen.blit(text_surface, (self.log_area.x + 10, y_offset + i * 20))
+    
+    def _update_death_rate(self):
+        """更新平滑的死亡率"""
+        if len(self.death_history) < self.smoothing_window:
+            # 不足窗口大小时，使用所有历史数据
+            window_data = self.death_history
+        else:
+            # 使用最近的窗口数据
+            window_data = self.death_history[-self.smoothing_window:]
+        
+        # 计算死亡率
+        death_rate = sum(window_data) / len(window_data) if window_data else 0
+        self.death_rate_smoothed.append(death_rate)
     
     def _add_log(self, message, level='INFO'):
         """添加日志消息"""

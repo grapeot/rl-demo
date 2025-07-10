@@ -108,7 +108,7 @@ def train(env, agent, visualizer=None, num_episodes=None):
 def demonstrate(env, agent, visualizer):
     """演示训练好的策略"""
     print("\nStarting demonstration mode...")
-    print("Press SPACE to start next episode, ESC to exit")
+    print("Press ESC to exit")
     
     # 设置演示模式的帧率（更慢）
     visualizer.set_fps(visualizer.config['demo_fps'])
@@ -117,40 +117,20 @@ def demonstrate(env, agent, visualizer):
     agent.epsilon = 0
     
     running = True
-    waiting = True
+    episode_count = 0
     
     while running:
-        # 等待用户按键
-        while waiting:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
-                    waiting = False
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_SPACE:
-                        waiting = False
-                    elif event.key == pygame.K_ESCAPE:
-                        running = False
-                        waiting = False
-            
-            # 绘制等待界面
-            visualizer.draw()
-            wait_text = visualizer.font.render("Press SPACE to start episode", True, (0, 0, 0))
-            text_rect = wait_text.get_rect(center=(visualizer.screen.get_width() // 2, 
-                                                  visualizer.screen.get_height() // 2))
-            visualizer.screen.blit(wait_text, text_rect)
-            pygame.display.flip()
-        
-        if not running:
-            break
-        
         # 运行一个episode
         state = env.reset()
         done = False
         total_reward = 0
         steps = 0
+        episode_count += 1
         
-        print(f"\nStarting new episode...")
+        print(f"\nStarting episode {episode_count}...")
+        
+        # 显示初始状态（修复：确保第一帧被渲染）
+        visualizer.update(state, None, 0, False, show_initial=True)
         
         while not done:
             # 处理事件
@@ -187,8 +167,10 @@ def demonstrate(env, agent, visualizer):
             steps += 1
         
         if running:
-            print(f"Episode finished! Steps: {steps}, Total Reward: {total_reward}")
-            waiting = True
+            print(f"Episode {episode_count} finished! Steps: {steps}, Total Reward: {total_reward}")
+            # 等待一下再开始下一个episode
+            import time
+            time.sleep(2)
     
     print("\nDemonstration ended")
 

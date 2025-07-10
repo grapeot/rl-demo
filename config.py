@@ -40,7 +40,7 @@ VIS_CONFIG = {
     'window_width': 1200,              # 窗口宽度
     'window_height': 800,              # 窗口高度
     'fps': 60,                         # 帧率（训练时）
-    'demo_fps': 30,                    # 帧率（演示时）
+    'demo_fps': 2,                     # 帧率（演示时）
     'fast_fps': 0,                     # 快速训练（0=无延时）
     'colors': {
         'background': (240, 240, 240),
