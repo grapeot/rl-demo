@@ -7,9 +7,10 @@ ENV_CONFIG = {
     'num_lanes': 5,                    # 车道数量
     'start_position': -1,              # 起点位置
     'end_position': 5,                 # 终点位置
-    'traffic_light_cycle': 10,         # 红绿灯周期（步数）
+    'traffic_light_cycle': 20,         # 红绿灯周期（步数）- 10步绿灯，10步红灯
     'car_spawn_probability': 0.3,      # 车辆生成概率
 }
+# 注：机器人需要6步到达终点，绿灯持续10步，给予充足时间
 
 # Q-Learning参数
 QL_CONFIG = {
