@@ -27,12 +27,13 @@ class RoadEnvironment:
         self.action_to_index = {action: i for i, action in enumerate(self.actions)}
         
         # 初始化环境状态
+        self.time_step = 0
         self.reset()
     
     def reset(self):
         """重置环境到初始状态"""
         self.robot_position = self.start_position
-        self.time_step = 0
+        # 保持time_step连续，不重置为0，这样红绿灯会持续变化
         self.cars_in_lanes = [False] * self.num_lanes
         self.done = False
         
