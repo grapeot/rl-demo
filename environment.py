@@ -98,6 +98,7 @@ class RoadEnvironment:
                 self.done = True
                 
         elif action == 'Backward':
+            # 允许在起点后退（相当于原地等待）
             self.robot_position = max(self.start_position, self.robot_position - 1)
         
         # 更新时间步和车辆
@@ -120,9 +121,8 @@ class RoadEnvironment:
         if state.robot_lane < self.end_position:
             valid_actions.append(0)  # Forward
         
-        # 后退：如果还没在起点
-        if state.robot_lane > self.start_position:
-            valid_actions.append(1)  # Backward
+        # 后退：总是可用（在起点时相当于原地等待）
+        valid_actions.append(1)  # Backward
             
         return valid_actions
     
