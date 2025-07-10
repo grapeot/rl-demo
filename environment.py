@@ -55,10 +55,16 @@ class RoadEnvironment:
     
     def _spawn_cars(self):
         """在车道上生成车辆"""
+        # 获取当前红绿灯状态
+        light_status = 1 if (self.time_step % self.traffic_light_cycle) < (self.traffic_light_cycle // 2) else 0
+        
         for i in range(self.num_lanes):
-            if random.random() < self.car_spawn_probability:
-                self.cars_in_lanes[i] = True
-            else:
+            if light_status == 0:  # 红灯时，车辆可以通行
+                if random.random() < self.car_spawn_probability:
+                    self.cars_in_lanes[i] = True
+                else:
+                    self.cars_in_lanes[i] = False
+            else:  # 绿灯时，车辆停止（不生成新车辆）
                 self.cars_in_lanes[i] = False
     
     def step(self, action):
