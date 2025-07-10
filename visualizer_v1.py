@@ -166,7 +166,9 @@ class VisualizerV1:
         self.screen.blit(text_surface, (x_offset + 5, start_y + 5))
         
         if self.env.robot_position == self.env.start_position:
-            self._draw_robot(x_offset + lane_width // 2, start_y + lane_height // 2)
+            # 保持与车道中机器人位置一致
+            robot_x = x_offset + (lane_width // 3) // 2
+            self._draw_robot(robot_x, start_y + lane_height // 2)
         
         # 绘制车道
         for i in range(self.env.num_lanes):
@@ -186,22 +188,28 @@ class VisualizerV1:
             text_surface = self.small_font.render(f"Lane {i}", True, self.colors['lane_divider'])
             self.screen.blit(text_surface, (x_offset + 5, y + 5))
             
-            # v1.0: 绘制车辆位置系统
+            # v1.0: 绘制车辆位置系统 - 将车道分成三等份
+            # 计算三个位置：右侧格子(0)、中心格子(1)、机器人位置
+            section_width = lane_width // 3
+            right_x = x_offset + lane_width - section_width // 2  # 右侧格子中心
+            center_x = x_offset + lane_width // 2  # 中心格子中心
+            robot_x = x_offset + section_width // 2  # 机器人位置（左侧）
+            
             car_status = self.env.cars_in_lanes[i]
             if car_status == 1:  # 右侧预警
-                self._draw_car_warning(x_offset + lane_width - 60, y + lane_height // 2)
+                self._draw_car_warning(right_x, y + lane_height // 2)
                 warning_text = "⚠️"
                 text_surface = self.tiny_font.render(warning_text, True, self.colors['car_warning'])
                 self.screen.blit(text_surface, (x_offset + lane_width - 30, y + 5))
             elif car_status == 2:  # 中心危险
-                self._draw_car_danger(x_offset + lane_width // 2, y + lane_height // 2)
+                self._draw_car_danger(center_x, y + lane_height // 2)
                 danger_text = "🚨"
                 text_surface = self.tiny_font.render(danger_text, True, self.colors['car_danger'])
                 self.screen.blit(text_surface, (x_offset + lane_width - 30, y + 5))
             
             # 绘制机器人
             if self.env.robot_position == i:
-                self._draw_robot(x_offset + lane_width // 2, y + lane_height // 2)
+                self._draw_robot(robot_x, y + lane_height // 2)
                 
                 # 如果机器人和车辆在同一位置且都在中心，高亮显示碰撞
                 if car_status == 2:
@@ -216,7 +224,9 @@ class VisualizerV1:
         self.screen.blit(text_surface, (x_offset + 5, goal_y + 5))
         
         if self.env.robot_position >= self.env.end_position:
-            self._draw_robot(x_offset + lane_width // 2, goal_y + lane_height // 2)
+            # 保持与车道中机器人位置一致
+            robot_x = x_offset + (lane_width // 3) // 2
+            self._draw_robot(robot_x, goal_y + lane_height // 2)
         
         # v1.0: 绘制下一车道预警信息
         if current_state.robot_lane >= 0 and current_state.robot_lane < self.env.num_lanes:
