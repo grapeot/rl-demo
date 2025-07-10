@@ -21,6 +21,8 @@ from config import TRAIN_CONFIG
 
 def train(env, agent, visualizer=None, num_episodes=None, version="v1.0"):
     """训练主循环 - 支持v0.5和v1.0"""
+    import pygame
+    
     num_episodes = num_episodes or TRAIN_CONFIG['num_episodes']
     
     # v1.0需要更多episode训练
