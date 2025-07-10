@@ -50,9 +50,17 @@ python main.py --mode train --episodes 500 --fast
 
 ## 测试命令
 ```bash
-# 测试环境模块
-python tmp_test_environment.py
+# 运行集成测试
+python tests/test_integration.py
 
-# 测试Q-Learning模块
-python tmp_test_qlearning.py
+# 快速验证安装
+python -c "from environment import RoadEnvironment; print('✓ 环境模块正常')"
+python -c "from q_learning import QLearningAgent; print('✓ Q-Learning模块正常')"
 ```
+
+## 重要修复记录
+- ✅ 交通灯逻辑：绿灯时无车辆，红灯时有车辆
+- ✅ 红绿灯周期：20步（10绿+10红），给机器人充足时间
+- ✅ 等待机制：机器人可在起点通过后退动作等待
+- ✅ 连续时间：红绿灯在多个episode间持续变化
+- ✅ 训练效率：快速模式（--fast）和无可视化模式（--no-vis）
