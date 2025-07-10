@@ -66,6 +66,7 @@ python -c "from q_learning import QLearningAgent; print('✓ Q-Learning模块正
 - ✅ 训练效率：快速模式（--fast）和无可视化模式（--no-vis）
 - ✅ Demo模式：自动播放（2 FPS），修复初始状态显示
 - ✅ 死亡率统计：实时图表显示训练进度和改进情况
+- ✅ 状态空间简化：移除car_imminent，消除同步问题和无效信号
 
 ## 可视化功能
 - **环境区域**：道路、机器人、车辆、红绿灯状态

@@ -66,9 +66,6 @@ class Visualizer:
                 self.death_history.append(is_death)
                 self._update_death_rate()
                 
-                # 调试信息
-                if is_death:
-                    print(f"DEBUG: Death detected! Final reward: {reward}, Total reward: {self.current_episode_reward}")
                 
                 self.current_episode_reward = 0
         
@@ -243,7 +240,7 @@ class Visualizer:
         
         # 对Q-Table按状态排序
         sorted_states = sorted(self.agent.q_table.keys(), 
-                             key=lambda s: (s.robot_lane, s.light_status, s.car_imminent))
+                             key=lambda s: (s.robot_lane, s.light_status))
         
         for i, state in enumerate(sorted_states[:max_rows]):
             q_values = self.agent.q_table[state]
@@ -259,7 +256,7 @@ class Visualizer:
                 pygame.draw.rect(self.screen, (255, 255, 200), highlight_rect)
             
             # 状态文本
-            state_text = f"({state.robot_lane}, {state.light_status}, {state.car_imminent})"
+            state_text = f"({state.robot_lane}, {state.light_status})"
             text_surface = self.small_font.render(state_text, True, self.colors['text'])
             self.screen.blit(text_surface, (header_x_positions[0], y_offset + i * row_height))
             

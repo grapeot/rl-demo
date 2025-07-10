@@ -6,7 +6,7 @@ from collections import namedtuple
 from config import ENV_CONFIG, REWARD_CONFIG
 
 # 状态定义
-State = namedtuple('State', ['robot_lane', 'light_status', 'car_imminent'])
+State = namedtuple('State', ['robot_lane', 'light_status'])
 
 class RoadEnvironment:
     """机器人过马路环境"""
@@ -47,12 +47,7 @@ class RoadEnvironment:
         # 红绿灯状态（基于时间步）
         light_status = 1 if (self.time_step % self.traffic_light_cycle) < (self.traffic_light_cycle // 2) else 0
         
-        # 下一车道是否有车
-        car_imminent = False
-        if 0 <= self.robot_position + 1 < self.num_lanes:
-            car_imminent = self.cars_in_lanes[self.robot_position + 1]
-        
-        return State(self.robot_position, light_status, car_imminent)
+        return State(self.robot_position, light_status)
     
     def _spawn_cars(self):
         """在车道上生成车辆"""
