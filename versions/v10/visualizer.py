@@ -166,8 +166,9 @@ class VisualizerV1:
         self.screen.blit(text_surface, (x_offset + 5, start_y + 5))
         
         if self.env.robot_position == self.env.start_position:
-            # 保持与车道中机器人位置一致
-            robot_x = x_offset + (lane_width // 3) // 2
+            # 保持与车道中机器人位置一致 - 左侧1/3的中心
+            section_width = lane_width // 3
+            robot_x = x_offset + section_width // 2
             self._draw_robot(robot_x, start_y + lane_height // 2)
         
         # 绘制车道
@@ -189,11 +190,11 @@ class VisualizerV1:
             self.screen.blit(text_surface, (x_offset + 5, y + 5))
             
             # v1.0: 绘制车辆位置系统 - 将车道分成三等份
-            # 计算三个位置：右侧格子(0)、中心格子(1)、机器人位置
+            # 计算三个位置：机器人位置(左)、中心格子(中)、右侧格子(右)
             section_width = lane_width // 3
-            right_x = x_offset + lane_width - section_width // 2  # 右侧格子中心
-            center_x = x_offset + lane_width // 2  # 中心格子中心
-            robot_x = x_offset + section_width // 2  # 机器人位置（左侧）
+            robot_x = x_offset + section_width // 2  # 机器人位置（左侧1/3的中心）
+            center_x = x_offset + section_width + section_width // 2  # 中心格子（中间1/3的中心）
+            right_x = x_offset + 2 * section_width + section_width // 2  # 右侧格子（右侧1/3的中心）
             
             car_status = self.env.cars_in_lanes[i]
             if car_status == 1:  # 右侧预警
@@ -224,8 +225,9 @@ class VisualizerV1:
         self.screen.blit(text_surface, (x_offset + 5, goal_y + 5))
         
         if self.env.robot_position >= self.env.end_position:
-            # 保持与车道中机器人位置一致
-            robot_x = x_offset + (lane_width // 3) // 2
+            # 保持与车道中机器人位置一致 - 左侧1/3的中心
+            section_width = lane_width // 3
+            robot_x = x_offset + section_width // 2
             self._draw_robot(robot_x, goal_y + lane_height // 2)
         
         # v1.0: 绘制下一车道预警信息

@@ -25,6 +25,11 @@ def train_with_factory(algorithm='linear_fa', environment='enhanced',
     # 创建统一训练器
     trainer = UnifiedTrainer(algorithm, environment, continuous)
     
+    # 如果有可视化器，更新其环境和智能体引用
+    if visualizer:
+        visualizer.env = trainer.environment
+        visualizer.agent = trainer.agent
+    
     # 训练日志
     log_filename = f"logs/training_{algorithm}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
     
@@ -64,6 +69,7 @@ def train_with_factory(algorithm='linear_fa', environment='enhanced',
                 # 可视化更新
                 if visualizer:
                     visualizer.update(state, action, reward, done)
+                    visualizer.clock.tick(visualizer.fps)
                 
                 state = next_state
                 steps += 1
@@ -155,9 +161,13 @@ def demonstrate_with_factory(algorithm='linear_fa', environment='enhanced',
             print("No trained model found. Please train first or specify model with --load")
             return
     
-    # 创建可视化器
+    # 创建或更新可视化器
     if not visualizer:
         visualizer = Visualizer(env, agent)
+    else:
+        # 更新可视化器的环境和智能体引用
+        visualizer.env = env
+        visualizer.agent = agent
     
     # 设置演示模式的帧率（更慢）
     visualizer.set_fps(visualizer.config['demo_fps'])
@@ -180,6 +190,7 @@ def demonstrate_with_factory(algorithm='linear_fa', environment='enhanced',
         
         # 显示初始状态
         visualizer.update(state, None, 0, False, show_initial=True)
+        visualizer.clock.tick(visualizer.fps)
         
         while not done:
             # 处理事件
@@ -220,6 +231,7 @@ def demonstrate_with_factory(algorithm='linear_fa', environment='enhanced',
             
             # 可视化
             visualizer.update(state, action, reward, done)
+            visualizer.clock.tick(visualizer.fps)
             
             state = next_state
             steps += 1
