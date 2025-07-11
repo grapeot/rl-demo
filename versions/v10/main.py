@@ -21,11 +21,11 @@ def train(env, agent, visualizer=None, num_episodes=None):
     save_interval = TRAIN_CONFIG['save_interval']
     
     # 创建保存目录
-    os.makedirs('saved_models/v1.0', exist_ok=True)
-    os.makedirs('logs/v1.0', exist_ok=True)
+    os.makedirs('saved_models/v10', exist_ok=True)
+    os.makedirs('logs/v10', exist_ok=True)
     
     # 训练日志
-    log_filename = f"logs/v1.0/training_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
+    log_filename = f"logs/v10/training_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
     
     print(f"Starting v1.0 training for {num_episodes} episodes...")
     print(f"Max steps per episode: {max_steps}")
@@ -93,12 +93,12 @@ def train(env, agent, visualizer=None, num_episodes=None):
         
         # 定期保存模型
         if (episode + 1) % save_interval == 0:
-            model_filename = f"saved_models/v1.0/q_table_v1.0_episode_{episode + 1}.pkl"
+            model_filename = f"saved_models/v10/q_table_v1.0_episode_{episode + 1}.pkl"
             agent.save_model(model_filename)
             print(f"Episode {episode + 1}: Steps={step}, Reward={total_reward:.2f}, Epsilon={agent.epsilon:.4f}")
     
     # 保存最终模型
-    final_model_filename = f"saved_models/v1.0/q_table_v1.0_final.pkl"
+    final_model_filename = f"saved_models/v10/q_table_v1.0_final.pkl"
     agent.save_model(final_model_filename)
     print(f"Training completed. Final model saved to {final_model_filename}")
 

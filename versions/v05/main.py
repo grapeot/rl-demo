@@ -19,11 +19,11 @@ def train(env, agent, visualizer=None, num_episodes=None):
     save_interval = TRAIN_CONFIG['save_interval']
     
     # 创建保存目录
-    os.makedirs('saved_models', exist_ok=True)
-    os.makedirs('logs', exist_ok=True)
+    os.makedirs('saved_models/v05', exist_ok=True)
+    os.makedirs('logs/v05', exist_ok=True)
     
     # 训练日志
-    log_filename = f"logs/training_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
+    log_filename = f"logs/v05/training_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
     
     print(f"Starting training for {num_episodes} episodes...")
     print(f"Max steps per episode: {max_steps}")
@@ -78,7 +78,7 @@ def train(env, agent, visualizer=None, num_episodes=None):
             
             # 保存模型
             if (episode + 1) % save_interval == 0:
-                model_filename = f"saved_models/q_table_episode_{episode + 1}.pkl"
+                model_filename = f"saved_models/v05/q_table_episode_{episode + 1}.pkl"
                 agent.save(model_filename)
             
             # 写入日志
@@ -86,7 +86,7 @@ def train(env, agent, visualizer=None, num_episodes=None):
                 f.write(f"{episode + 1},{steps},{total_reward},{agent.epsilon}\n")
         
         # 保存最终模型
-        final_model_filename = "saved_models/q_table_final.pkl"
+        final_model_filename = "saved_models/v05/q_table_final.pkl"
         agent.save(final_model_filename)
         print(f"\nTraining completed! Final model saved to {final_model_filename}")
         
@@ -101,7 +101,7 @@ def train(env, agent, visualizer=None, num_episodes=None):
     except KeyboardInterrupt:
         print("\nTraining interrupted by user")
         # 保存当前进度
-        interrupt_model_filename = f"saved_models/q_table_interrupted_episode_{episode + 1}.pkl"
+        interrupt_model_filename = f"saved_models/v05/q_table_interrupted_episode_{episode + 1}.pkl"
         agent.save(interrupt_model_filename)
         print(f"Current progress saved to {interrupt_model_filename}")
 
@@ -213,7 +213,7 @@ def main():
         elif args.mode == 'demo':
             if not args.load:
                 # 尝试加载最终模型
-                final_model = "saved_models/q_table_final.pkl"
+                final_model = "saved_models/v05/q_table_final.pkl"
                 if os.path.exists(final_model):
                     agent.load(final_model)
                 else:

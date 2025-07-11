@@ -6,7 +6,7 @@ from shared.base_config import BaseConfig
 
 class V20Config(BaseConfig):
     def __init__(self):
-        super().__init__("v2.0")
+        super().__init__("v20")
         
         # v2.0算法配置
         self.algorithm_config = {

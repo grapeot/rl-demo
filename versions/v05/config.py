@@ -6,7 +6,7 @@ from shared.base_config import BaseConfig
 
 class V05Config(BaseConfig):
     def __init__(self):
-        super().__init__("v0.5")
+        super().__init__("v05")
         
         # v0.5特有的Q-Learning参数
         self.ql_config = {

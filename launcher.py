@@ -44,7 +44,7 @@ def main():
     
     parser = argparse.ArgumentParser(description='RL-Demo 统一启动器')
     parser.add_argument('--version', choices=available_versions, 
-                       required=True, help='选择版本')
+                       required=True, help='选择版本 (v05=v0.5, v10=v1.0, v20=v2.0)')
     parser.add_argument('--mode', choices=['train', 'demo', 'both'], 
                        default='train', help='运行模式')
     parser.add_argument('--episodes', type=int, default=None,
