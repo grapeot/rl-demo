@@ -163,8 +163,16 @@ class Visualizer:
             text_surface = self.small_font.render(f"Lane {i}", True, self.colors['lane_divider'])
             self.screen.blit(text_surface, (x_offset + 5, y + 5))
             
-            # 绘制车辆
-            if self.env.cars_in_lanes[i]:
+            # 绘制车辆 (支持新旧环境)
+            has_car = False
+            if hasattr(self.env, 'cars_in_lanes'):
+                # 旧环境
+                has_car = self.env.cars_in_lanes[i]
+            elif hasattr(self.env, 'lane_cars'):
+                # 新环境
+                has_car = self.env.lane_cars[i] > 0
+            
+            if has_car:
                 self._draw_car(self.env_area.centerx + 50, y + lane_height // 2)
             
             # 绘制机器人
@@ -238,43 +246,63 @@ class Visualizer:
         row_height = 20  # 减小行高
         max_rows = min(12, available_height // row_height)  # 最多显示12行
         
-        # 对Q-Table按状态排序
-        sorted_states = sorted(self.agent.q_table.keys(), 
-                             key=lambda s: (s.robot_lane, s.light_status))
+        # 检查智能体类型并相应显示Q值
+        if hasattr(self.agent, 'q_table'):
+            # 传统Q-Learning
+            sorted_states = sorted(self.agent.q_table.keys(), 
+                                 key=lambda s: (s.robot_lane, s.light_status))
+            
+            for i, state in enumerate(sorted_states[:max_rows]):
+                q_values = self.agent.q_table[state]
+                self._draw_qtable_row(i, state, q_values, current_state, y_offset, row_height, header_x_positions)
+        elif hasattr(self.agent, 'weights'):
+            # 线性函数近似Q-Learning
+            self._draw_linear_q_info(y_offset, row_height, max_rows, header_x_positions)
+        else:
+            # 未知类型
+            text_surface = self.small_font.render("Q-values not available", True, self.colors['text'])
+            self.screen.blit(text_surface, (header_x_positions[0], y_offset))
+    
+    def _draw_qtable_row(self, i, state, q_values, current_state, y_offset, row_height, header_x_positions):
+        """绘制Q-table行"""
+        # 高亮当前状态
+        if state == current_state:
+            highlight_rect = pygame.Rect(
+                self.qtable_area.x + 5,
+                y_offset + i * row_height - 2,
+                self.qtable_area.width - 10,
+                row_height - 2
+            )
+            pygame.draw.rect(self.screen, (255, 255, 200), highlight_rect)
         
-        for i, state in enumerate(sorted_states[:max_rows]):
-            q_values = self.agent.q_table[state]
-            
-            # 高亮当前状态
-            if state == current_state:
-                highlight_rect = pygame.Rect(
-                    self.qtable_area.x + 5,
-                    y_offset + i * row_height - 2,
-                    self.qtable_area.width - 10,
-                    row_height - 2
-                )
-                pygame.draw.rect(self.screen, (255, 255, 200), highlight_rect)
-            
-            # 状态文本
-            state_text = f"({state.robot_lane}, {state.light_status})"
-            text_surface = self.small_font.render(state_text, True, self.colors['text'])
-            self.screen.blit(text_surface, (header_x_positions[0], y_offset + i * row_height))
-            
-            # Q值
-            for j, q_value in enumerate(q_values):
-                # 使用颜色编码Q值
-                color = self._get_q_value_color(q_value)
-                q_text = f"{q_value:.2f}"
-                text_surface = self.small_font.render(q_text, True, color)
-                self.screen.blit(text_surface, 
-                               (header_x_positions[j + 1], y_offset + i * row_height))
+        # 状态文本
+        state_text = f"({state.robot_lane}, {state.light_status})"
+        text_surface = self.small_font.render(state_text, True, self.colors['text'])
+        self.screen.blit(text_surface, (header_x_positions[0], y_offset + i * row_height))
         
-        # 如果Q-Table条目太多，显示提示
-        if len(sorted_states) > max_rows:
-            more_text = f"... and {len(sorted_states) - max_rows} more states"
-            text_surface = self.small_font.render(more_text, True, self.colors['text'])
+        # Q值
+        for j, q_value in enumerate(q_values):
+            # 使用颜色编码Q值
+            color = self._get_q_value_color(q_value)
+            q_text = f"{q_value:.2f}"
+            text_surface = self.small_font.render(q_text, True, color)
             self.screen.blit(text_surface, 
-                           (self.qtable_area.x + 10, y_offset + max_rows * row_height))
+                           (header_x_positions[j + 1], y_offset + i * row_height))
+    
+    def _draw_linear_q_info(self, y_offset, row_height, max_rows, header_x_positions):
+        """绘制线性函数近似Q-Learning信息"""
+        # 显示权重信息
+        info_lines = [
+            f"Linear FA Q-Learning",
+            f"Features: {self.agent.n_features}",
+            f"Actions: {self.agent.n_actions}",
+            f"Alpha: {self.agent.alpha:.4f}",
+            f"Epsilon: {self.agent.epsilon:.4f}"
+        ]
+        
+        for i, line in enumerate(info_lines[:max_rows]):
+            text_surface = self.small_font.render(line, True, self.colors['text'])
+            self.screen.blit(text_surface, (header_x_positions[0], y_offset + i * row_height))
     
     def _draw_death_rate_chart(self):
         """绘制死亡率图表"""
