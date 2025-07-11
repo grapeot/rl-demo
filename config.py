@@ -35,6 +35,24 @@ TRAIN_CONFIG = {
     'save_interval': 100,              # 保存模型间隔
 }
 
+# v2.0算法配置
+ALGORITHM_CONFIG = {
+    'algorithm': 'linear_fa',          # 'q_table' or 'linear_fa'
+    'environment': 'enhanced',         # 'classic' or 'enhanced'
+    'continuous_mode': True,           # 是否使用连续位置模式
+}
+
+# 线性函数近似配置
+LINEAR_FA_CONFIG = {
+    'n_features': 9,                   # 特征数量
+    'alpha': 0.01,                     # 学习率（比Q-table更小）
+    'gamma': 0.9,                      # 折扣因子
+    'epsilon': 1.0,                    # 探索率初始值
+    'epsilon_decay': 0.995,            # 探索率衰减
+    'epsilon_min': 0.01,               # 最小探索率
+    'weight_init': 'zeros',            # 权重初始化 ('zeros', 'random', 'small_random')
+}
+
 # 可视化参数
 VIS_CONFIG = {
     'window_width': 1200,              # 窗口宽度
