@@ -5,7 +5,7 @@ import pygame
 import math
 from datetime import datetime
 from collections import deque
-from config import VIS_CONFIG
+from .config import VIS_CONFIG
 
 class Visualizer:
     """可视化系统"""

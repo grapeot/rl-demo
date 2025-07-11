@@ -2,6 +2,9 @@
 v2.0版本配置文件 - 线性函数近似配置
 """
 
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from shared.base_config import BaseConfig
 
 class V20Config(BaseConfig):

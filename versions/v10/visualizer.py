@@ -5,7 +5,7 @@ import pygame
 import math
 from datetime import datetime
 from collections import deque
-from config import VIS_CONFIG
+from .config import VIS_CONFIG
 
 class VisualizerV1:
     """可视化系统 v1.0 - 支持420状态空间"""
