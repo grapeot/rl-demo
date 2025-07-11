@@ -49,7 +49,8 @@ robot-rl-cross-road/
 ├── visualizer.py        # 可视化系统
 ├── config.py           # 配置参数
 ├── tests/              # 测试脚本
-├── plan.md             # 详细设计文档
+├── docs/               # 文档目录
+│   └── designs/        # 设计文档
 └── CLAUDE.md           # 开发笔记
 ```
 
@@ -120,7 +121,7 @@ python tests/test_integration.py
 - 更复杂的交通场景
 - 多智能体协同
 
-详见 [plan-v1.md](plan-v1.md) 了解最新的开发计划。
+详见 [docs/designs/](docs/designs/) 了解各版本的设计文档。
 
 ## 贡献
 

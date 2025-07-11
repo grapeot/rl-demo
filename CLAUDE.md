@@ -46,12 +46,16 @@ python main.py --mode train --episodes 500 --fast
 - `visualizer.py`: Pygame可视化系统
 - `config.py`: 配置参数
 - `main.py`: 主程序入口
-- `plan.md`: v0.5项目设计文档（已完成）
-- `plan-v1.md`: v1.0项目设计文档（规划阶段）
+- `docs/designs/`: 设计文档目录
+  - `design_v0.5.md`: v0.5项目设计文档（已完成）
+  - `design_v1.0.md`: v1.0项目设计文档（规划阶段）
+  - `design_v2.0.md`: v2.0项目设计文档（已完成）
+  - `design_refactor.md`: 重构设计文档
 
 ## 版本管理
 - **v0.5** ✅: 基础Q-Learning，2D状态空间，已打tag
-- **v1.0** 📋: 多格子车道，倒计时系统，规划中
+- **v1.0** ✅: 多格子车道，倒计时系统，已完成
+- **v2.0** ✅: 线性函数近似，特征工程，已完成
 
 ## 测试命令
 ```bash
