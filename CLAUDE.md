@@ -82,3 +82,10 @@ python -c "from q_learning import QLearningAgent; print('✓ Q-Learning模块正
 - **Q-Table区域**：实时Q值更新，当前状态高亮
 - **统计图表**：死亡率趋势，50回合滑动平均
 - **日志区域**：详细的决策过程记录
+
+## Important Git 提交规则
+- ⚠️ **NEVER use `git add -A`** when multiple people are working on the project
+- ✅ **ALWAYS add specific files only**: `git add file1.py file2.py`
+- ✅ **Only commit your own changes**: Don't accidentally commit other people's work
+- ✅ **Check `git status` first**: Always verify what you're about to commit
+- ✅ **Use selective staging**: Add only the files you actually modified
