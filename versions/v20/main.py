@@ -66,9 +66,9 @@ def train_with_factory(algorithm='linear_fa', environment='enhanced',
                 # 更新智能体
                 trainer.agent.update(state, action, reward, next_state, done)
                 
-                # 可视化更新
+                # 可视化更新 - 使用新状态
                 if visualizer:
-                    visualizer.update(state, action, reward, done)
+                    visualizer.update(next_state, action, reward, done)
                     visualizer.clock.tick(visualizer.fps)
                 
                 state = next_state
@@ -229,8 +229,8 @@ def demonstrate_with_factory(algorithm='linear_fa', environment='enhanced',
                 print(f"Step {steps}: State {state} -> Action: {action_name} "
                       f"(Q-values: Forward={q_values[0]:.2f}, Backward={q_values[1]:.2f})")
             
-            # 可视化
-            visualizer.update(state, action, reward, done)
+            # 可视化 - 使用新状态
+            visualizer.update(next_state, action, reward, done)
             visualizer.clock.tick(visualizer.fps)
             
             state = next_state

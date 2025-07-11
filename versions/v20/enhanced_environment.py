@@ -141,7 +141,7 @@ class EnhancedRoadEnvironment:
         
         if action == 'Forward':
             if self.continuous_mode:
-                self.robot_position += 0.5  # 半格子移动
+                self.robot_position += 1.0  # 每步移动1个单位
             else:
                 self.robot_position += 1
             
@@ -152,7 +152,7 @@ class EnhancedRoadEnvironment:
                 
         elif action == 'Backward':
             if self.continuous_mode:
-                self.robot_position = max(float(self.start_position), self.robot_position - 0.5)
+                self.robot_position = max(float(self.start_position), self.robot_position - 1.0)
             else:
                 self.robot_position = max(self.start_position, self.robot_position - 1)
         
