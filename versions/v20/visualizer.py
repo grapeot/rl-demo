@@ -126,6 +126,12 @@ class Visualizer:
         # 获取当前状态
         current_state = self.env._get_state()
         
+        # 处理连续位置系统
+        if hasattr(current_state, 'robot_position'):
+            robot_position = current_state.robot_position
+        else:
+            robot_position = self.env.robot_position
+        
         # 绘制红绿灯
         light_y = self.env_area.y + 10
         light_color = self.colors['green_light'] if current_state.light_status == 1 else self.colors['red_light']
@@ -142,8 +148,11 @@ class Visualizer:
         self.screen.blit(text_surface, (x_offset + 5, start_y + 5))
         
         # 如果机器人在起点，绘制机器人
-        if self.env.robot_position == self.env.start_position:
-            self._draw_robot(self.env_area.centerx, start_y + lane_height // 2)
+        if robot_position == self.env.start_position:
+            # 保持与车道中机器人位置一致 - 左侧1/3的中心
+            section_width = lane_width // 3
+            robot_x = x_offset + section_width // 2
+            self._draw_robot(robot_x, start_y + lane_height // 2)
         
         # 绘制车道
         for i in range(self.env.num_lanes):
@@ -163,21 +172,31 @@ class Visualizer:
             text_surface = self.small_font.render(f"Lane {i}", True, self.colors['lane_divider'])
             self.screen.blit(text_surface, (x_offset + 5, y + 5))
             
-            # 绘制车辆 (支持新旧环境)
-            has_car = False
-            if hasattr(self.env, 'cars_in_lanes'):
-                # 旧环境
-                has_car = self.env.cars_in_lanes[i]
-            elif hasattr(self.env, 'lane_cars'):
-                # 新环境
-                has_car = self.env.lane_cars[i] > 0
-            
-            if has_car:
+            # 绘制车辆 (支持连续位置环境)
+            if hasattr(self.env, 'lane_cars') and self.env.lane_cars[i] > 0:
+                # v2.0增强环境 - 三等分布局
+                section_width = lane_width // 3
+                car_position = self.env.lane_cars[i]
+                
+                if car_position < 1.0:  # 右侧位置
+                    car_x = x_offset + 2 * section_width + section_width // 2
+                elif car_position < 2.0:  # 中心位置  
+                    car_x = x_offset + section_width + section_width // 2
+                else:  # 左侧位置
+                    car_x = x_offset + section_width // 2
+                    
+                self._draw_car(car_x, y + lane_height // 2)
+            elif hasattr(self.env, 'cars_in_lanes') and self.env.cars_in_lanes[i]:
+                # v0.5/v1.0环境 - 简单布局
                 self._draw_car(self.env_area.centerx + 50, y + lane_height // 2)
             
-            # 绘制机器人
-            if self.env.robot_position == i:
-                self._draw_robot(self.env_area.centerx, y + lane_height // 2)
+            # 绘制机器人 - 使用连续位置
+            # 检查机器人是否在这个车道
+            if (robot_position >= i and robot_position < i + 1) or (robot_position == i):
+                # 机器人位置：左侧1/3的中心
+                section_width = lane_width // 3
+                robot_x = x_offset + section_width // 2
+                self._draw_robot(robot_x, y + lane_height // 2)
         
         # 绘制终点
         goal_y = start_y + (self.env.num_lanes + 1) * lane_height
@@ -187,8 +206,11 @@ class Visualizer:
         self.screen.blit(text_surface, (x_offset + 5, goal_y + 5))
         
         # 如果机器人到达终点，绘制机器人
-        if self.env.robot_position >= self.env.end_position:
-            self._draw_robot(self.env_area.centerx, goal_y + lane_height // 2)
+        if robot_position >= self.env.end_position:
+            # 保持与车道中机器人位置一致 - 左侧1/3的中心
+            section_width = lane_width // 3
+            robot_x = x_offset + section_width // 2
+            self._draw_robot(robot_x, goal_y + lane_height // 2)
     
     def _draw_robot(self, x, y):
         """绘制机器人"""
